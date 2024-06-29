@@ -59,12 +59,14 @@ export default function OrderDetails({ auth, selectedProduct: initialSelectedPro
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 dark:text-gray-200 md:w-1/2 2xl:w-1/3">
                     <h1 className=' font-bold mb-6 text-xl'>Edit Ordered Product</h1>
-                    <Card>
+                    <Card className='dark:bg-zinc-800'>
                         <form onSubmit={handleSubmit}>
-                            <p>{product.product_name}</p>
+                            <p className='mb-4'>{product.product_name}</p>
+                            <div className="grid grid-cols-2">
                             {product.categories.map(category => (
-                                <div key={category.id}>
-                                    <p>{category.category_name}</p>
+                                <div key={category.id} className='mb-3'>
+                                    <p className='opacity-50'>{category.category_name}</p>
+                                    <div className="flex gap-4">
                                     {category.variation.map(variation => (
                                         <div key={variation.id}>
                                             <Radio
@@ -78,8 +80,10 @@ export default function OrderDetails({ auth, selectedProduct: initialSelectedPro
                                             <Label htmlFor={`variation-${variation.id}`}>{variation.variation_name}</Label>
                                         </div>
                                     ))}
+                                    </div>
                                 </div>
                             ))}
+                            </div>
                             <p>Subtotal: ${subtotal.toFixed(2)}</p>
                             <PrimaryButton className="mt-4" processing={processing}>Save</PrimaryButton>
                         </form>

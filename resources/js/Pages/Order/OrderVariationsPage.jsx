@@ -70,7 +70,7 @@ export default function OrderVariationsPage({ data, setData, selectedProducts, p
                         if (!selectedProduct) return null;
 
                         return (
-                            <div key={productId} className='rounded-md p-4 bg-zinc-100 dark:bg-zinc-800 mb-4'>
+                            <div key={productId} className='rounded-md p-4 bg-zinc-100 dark:bg-zinc-900 mb-4'>
                                 <h3 className='mb-2 opacity-50'>For {selectedProduct.product_name}</h3>
 
                                 <div className="gap-4">

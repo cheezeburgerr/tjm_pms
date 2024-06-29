@@ -5,16 +5,18 @@ import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link } from '@inertiajs/react';
 import DarkModeToggle from '@/Components/DarkModeToggle';
+import { IconBell, IconNotification } from '@tabler/icons-react';
+import ChatBox from '@/Components/ChatBox/ChatBox';
 
 export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
-        <div className=" min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className=" min-h-screen bg-gray-100 dark:bg-zinc-950">
 
-            <nav className="sticky top-0 bg-gray-100 dark:bg-zinc-950 dark:border-gray-700 z-50">
+            <nav className="sticky top-0 bg-gray-100/50 dark:bg-zinc-950/85 dark:border-gray-700 z-50 backdrop-blur-lg ">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-14">
+                    <div className="flex md:grid grid-cols-3 justify-between h-14">
                         <div className="flex">
                             <div className="shrink-0 flex items-center">
                                 <Link href="/">
@@ -25,7 +27,7 @@ export default function Authenticated({ user, header, children }) {
 
                         </div>
 
-                        <div className="hidden sm:-my-px sm:ms-10 sm:flex me-8 h-full space-x-8">
+                        <div className="justify-center hidden sm:-my-px sm:ms-10 sm:flex me-8 h-full space-x-8">
                                 <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     Home
                                 </NavLink>
@@ -36,14 +38,16 @@ export default function Authenticated({ user, header, children }) {
                                     3D Designer
                                 </NavLink>
                             </div>
-                        <div className="hidden sm:flex sm:items-center sm:ms-6">
+                        <div className=" justify-end hidden sm:flex sm:items-center sm:ms-6">
 
 
                             <div className="ms-3 relative">
 
 
                                 {user ? (
-                                    <Dropdown className=''>
+                                    <div className="flex gap-4 items-center text-gray-500">
+                                        <IconBell />
+                                        <Dropdown className=''>
                                         <Dropdown.Trigger>
                                             <span className="inline-flex rounded-md">
                                                 <button
@@ -69,12 +73,13 @@ export default function Authenticated({ user, header, children }) {
                                         </Dropdown.Trigger>
 
                                         <Dropdown.Content className='rounded-none'>
-                                            <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
+                                            <Dropdown.Link href={route('profile.index')}>Profile</Dropdown.Link>
                                             <Dropdown.Link href={route('logout')} method="post" as="button">
                                                 Log Out
                                             </Dropdown.Link>
                                         </Dropdown.Content>
                                     </Dropdown>
+                                    </div>
                                 ) : (
                                     <>
                                         <Link
@@ -96,7 +101,7 @@ export default function Authenticated({ user, header, children }) {
                             <DarkModeToggle/>
                         </div>
 
-                        <div className="-me-2 flex items-center sm:hidden">
+                        <div className="justify-end -me-2 flex items-center sm:hidden">
                             <button
                                 onClick={() => setShowingNavigationDropdown((previousState) => !previousState)}
                                 className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out"
@@ -173,7 +178,14 @@ export default function Authenticated({ user, header, children }) {
 
 
             <div className="flex flex-col min-h-screen">
-            <main className='bg-gray-200 dark:bg-zinc-950 flex-grow'>{children}</main>
+            <main className='bg-gray-200 dark:bg-zinc-950 flex-grow text-zinc-800'>{children}</main>
+
+                {user && (
+                    <>
+                        <ChatBox user_id={user.id}/>
+                    </>
+                )}
+
 
 
 

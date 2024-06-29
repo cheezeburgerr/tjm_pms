@@ -51,4 +51,21 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function department ()
+    {
+        return $this->belongsTo(Department::class, 'dept_id');
+    }
+
+    public function chatroom ()
+    {
+        return $this->hasOne(ChatRoom::class, 'user_id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'user_id');
+    }
+
+    
 }

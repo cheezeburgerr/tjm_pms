@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('contact_number');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->fereignId('dept_id');
+            $table->unsignedBigInteger('dept_id');
             $table->string('image')->nullable();
             $table->rememberToken();
             $table->timestamps();

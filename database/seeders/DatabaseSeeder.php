@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Department;
+use App\Models\Equipment;
 use App\Models\Products;
 use App\Models\User;
 use App\Models\Variation;
@@ -58,22 +59,87 @@ class DatabaseSeeder extends Seeder
         //     'category_id' => 1
         // ]);
 
-         Department::create([
-                'dept_name' => 'Artist',
-            ]);
+        //  Department::create([
+        //         'dept_name' => 'Artist',
+        //     ]);
 
-            Department::create([
-                'dept_name' => 'Customer Service Representative',
-            ]);
-            Department::create([
-                'dept_name' => 'Printing',
-            ]);
-            Department::create([
-                'dept_name' => 'Checking',
-            ]);
-            Department::create([
-                'dept_name' => 'Sewing',
-            ]);
+        //     Department::create([
+        //         'dept_name' => 'Customer Service Representative',
+        //     ]);
+        //     Department::create([
+        //         'dept_name' => 'Printing',
+        //     ]);
+        //     Department::create([
+        //         'dept_name' => 'Checking',
+        //     ]);
+        //     Department::create([
+        //         'dept_name' => 'Sewing',
+        //     ]);
 
+        //   User::create([
+        //     'user_id' => 'TJM_00002',
+        //     'name' => 'Cherry Corrales',
+        //     'email' => 'cherrycorrales@gmail.com',
+        //     'user_type' => 'Employee',empl
+        //     'contact_number' => '09776765454',
+        //     'address' => 'San Carlos',
+        //     'is_supervisor' => 0,
+        //     'dept_id' => 2,
+        //     'password' => Hash::make('password')
+        // ]);
+
+        // User::create([
+        //     'user_id' => 'TJM_00003',
+        //     'name' => 'Floyd De Vera',
+        //     'email' => 'floyddevera@gmail.com',
+        //     'user_type' => 'Employee',
+        //     'contact_number' => '09323434454',
+        //     'address' => 'Binmaley',
+        //     'is_supervisor' => 1,
+        //     'dept_id' => 1,
+        //     'password' => Hash::make('password')
+        // ]);
+
+        // Equipment::create([
+        //     'equipment_name' => 'ATEXCO',
+        //     'type' => 'Printer',
+        //     'status' => 'Working'
+        // ]);
+
+        // Equipment::create([
+        //     'equipment_name' => 'EPSON',
+        //     'type' => 'Printer',
+        //     'status' => 'Working'
+        // ]);
+
+        // Equipment::create([
+        //     'equipment_name' => 'Tecjet',
+        //     'type' => 'Printer',
+        //     'status' => 'Working'
+        // ]);
+
+        User::create([
+            'user_id' => 'TJM_00004',
+            'name' => 'Deither Ramos',
+            'email' => 'deither@gmail.com',
+            'user_type' => 'Employee',
+            'contact_number' => '0977875453',
+            'address' => 'San Carlos',
+            'is_supervisor' => 0,
+            'dept_id' => 3,
+            'password' => Hash::make('password')
+        ]);
+
+        User::create([
+            'user_id' => 'TJM_00005',
+            'name' => 'Chris Cadiao',
+            'email' => 'chriscadiao@gmail.com',
+            'user_type' => 'Employee',
+            'contact_number' => '09302441874',
+            'address' => 'San Carlos',
+            'is_supervisor' => 0,
+            'dept_id' => 4,
+            'password' => Hash::make('password')
+        ]);
     }
 }

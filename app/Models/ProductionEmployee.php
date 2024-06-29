@@ -14,4 +14,8 @@ class ProductionEmployee extends Model
         'user_id',
         'employee_role'
     ];
+
+    public function employee() {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

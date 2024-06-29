@@ -40,7 +40,7 @@ export default function OrderFormStepOne({ data, setData, nextStep }) {
 
     return (
         <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
-            <div className="mt-4 items-center w-1/2">
+            <div className="mt-4 items-center w-full md:w-1/2">
                 <h1 className="mb-4 text-center">Please fill up the details.</h1>
                 <div className="mb-4 w-full">
                     <InputLabel for='team_name'>Team Name</InputLabel>
@@ -81,9 +81,9 @@ export default function OrderFormStepOne({ data, setData, nextStep }) {
                     <div
 
                         onClick={handleUploadButtonClick}
-                        className="block w-full border border-zinc-300 dark:border-zinc-800 rounded-md p-4 text-center cursor-pointer bg-zinc-50 shadow-lg dark:bg-zinc-800"
+                        className="block w-full border border-zinc-300 dark:border-zinc-800 rounded-md p-4 text-center cursor-pointer bg-zinc-50 shadow-lg dark:bg-zinc-900"
                     >
-                       <div className="text-center flex justify-center flex-col items-center gap-4 opacity-50 border border-zinc-500 p-8 rounded-md">
+                       <div className="text-center flex justify-center flex-col items-center gap-4 opacity-50 border border-zinc-600 p-8 rounded-md">
                        <IconUpload size={56}/>
 
                        Upload your design here.

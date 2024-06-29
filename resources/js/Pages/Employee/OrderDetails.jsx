@@ -4,6 +4,7 @@ import EmployeeLayout from '@/Layouts/EmployeeLayout';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { Card } from 'flowbite-react';
 import { IconEdit, IconPackage, IconPencil, IconPhoto, IconTag, IconUser } from '@tabler/icons-react';
+import moment from 'moment';
 
 export default function OrderDetails({ auth, products, order }) {
     // State to track the fullscreen image
@@ -26,14 +27,14 @@ export default function OrderDetails({ auth, products, order }) {
         >
             <Head title="Order" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 dark:text-zinc-200">
+            <div className="">
+                <div className=" mx-auto sm:px-6 lg:px-8">
                     <h1 className="font-bold text-3xl mb-4">Order Details</h1>
-                    <Card className='dark:bg-zinc-800 dark:border-zinc-700'>
+                    <Card className='dark:bg-zinc-900 dark:border-zinc-800'>
                         <div className="flex justify-between">
                             <div>
                                 <h3 className='font-bold'>Order #{order.id}</h3>
-                                <p className='text-sm'>{order.due_date}</p>
+                                <p className='text-sm'>{moment(order.due_date).format("MMMM Do, YYYY")}</p>
                                 <p className='text-sm bg-aqua px-2 rounded-full text-zinc-900 font-bold text-center'>{order.production.status}</p>
                             </div>
                         </div>
@@ -46,7 +47,7 @@ export default function OrderDetails({ auth, products, order }) {
                                 <div>
                                     <h className="font-bold text-md">Team Details</h>
                                     <p><span className="opacity-50 mr-2">Team Name</span> {order.team_name}</p>
-                                    <p><span className="opacity-50 mr-2">Due Date</span> {order.due_date}</p>
+                                    <p><span className="opacity-50 mr-2">Due Date</span> {moment(order.due_date).format("MMMM Do, YYYY")}</p>
                                     <p><span className="opacity-50 mr-2">Fabric</span></p>
                                 </div>
                             </div>

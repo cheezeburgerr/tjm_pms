@@ -35,4 +35,29 @@ class Order extends Model
     {
         return $this->hasOne(ProductionDetails::class, 'order_id');
     }
+
+    public function employees()
+    {
+        return $this->hasMany(ProductionEmployee::class, 'order_id');
+    }
+
+    public function approved()
+    {
+        return $this->hasMany(ApproveDesign::class, 'order_id')->latest();
+    }
+
+    public function latestapproved()
+    {
+        return $this->hasOne(ApproveDesign::class)->latestOfMany();
+    }
+
+    public function errors()
+    {
+        return $this->hasMany(Lineup::class, 'order_id')->where('status', 'Error');
+    }
+
+    public function reprint()
+    {
+        return $this->hasMany(Lineup::class, 'order_id')->where('status', 'Reprint');
+    }
 }

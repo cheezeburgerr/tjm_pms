@@ -33,7 +33,7 @@ export default function Login({ status, canResetPassword }) {
 
 
             <div className="flex justify-between">
-                <h1 className="font-bold text-2xl mb-4">Employee Login</h1>
+                <h1 className="font-bold text-2xl mb-4 dark:text-gray-100">Employee Login</h1>
                 <Link href="/">
                     <ApplicationLogo className="w-20 h-20 fill-current text-gray-500 mb-2" />
                 </Link>

@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendNotif;
+use App\Models\ApproveDesign;
 use App\Models\Lineup;
+use App\Models\Notification;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\OrderVariation;
 use App\Models\ProductionDetails;
 use App\Models\Products;
+use App\Models\User;
+use Carbon\Carbon;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 
 class OrderController extends Controller
@@ -17,7 +25,6 @@ class OrderController extends Controller
     //
 
     public function index () {
-
 
         $products = Products::with('categories.variation')->get();
         return Inertia::render('Order', ['products' => $products]);
@@ -51,7 +58,15 @@ class OrderController extends Controller
     }
 
     public function show ($id) {
-        $order = Order::with('production', 'products.products', 'products.variations.category', 'products.variations.variations', 'lineups.products', 'files', 'customer')->find($id);
+
+        $order = Order::with('production', 'products.products', 'products.variations.category', 'products.variations.variations', 'lineups.products', 'files', 'customer', 'latestapproved')->find($id);
+        if(!$order){
+            return redirect()->route('dashboard');
+        }
+
+        if(Auth::user()->id !== $order->customer->id){
+            return redirect()->route('dashboard');
+        }
         return Inertia::render('Order/OrderDetails', ['order' => $order]);
     }
     public function store(Request $request)
@@ -171,6 +186,134 @@ class OrderController extends Controller
 
         // }
 
+        $csr = User::where('dept_id', 2)->get();
+        foreach($csr as $c){
+            $notif = Notification::create([
+                'user_id' => $c->id,
+                'title' => 'New Order Placed',
+                'message' => 'Order "'.$order->team_name.'" has been placed by one of the customers. Check it out.',
+                'url' => '/employee/view-order/'.$order->id
+            ]);
+
+            SendNotif::dispatch($notif);
+        }
+
+
+        dd('Tapos');
         return redirect()->route('orders.downpayment', $order->id); // Adjust as per your needs
+    }
+
+    public function cancel_order(Request $request, $id) {
+
+
+        $order = Order::with('production')->find($id);
+        $order->production->status = $request->status;
+        $order->production->save();
+
+
+        return to_route('dashboard')->with('success', 'Order Successfully Cancelled.');
+    }
+
+    public function approval ($id) {
+        $order = Order::with('production', 'latestapproved')->find($id);
+
+        return Inertia::render('Approval', ['order' => $order]);
+    }
+
+    public function approve (Request $request) {
+        $approved = ApproveDesign::find($request->id);
+        $approved->status = 'Approved';
+        $approved->save();
+
+        $order = Order::with('production')->find($approved->order_id);
+        $order->production->note = 'Design Approved';
+        $order->production->save();
+
+        return to_route('dashboard')->with('success', 'Design Approved');
+    }
+
+    public function reject (Request $request) {
+        $approved = ApproveDesign::find($request->id);
+        $approved->status = 'Rejected';
+        $approved->save();
+
+        $order = Order::with('production')->find($approved->order_id);
+        $order->production->note = 'Design Rejected';
+        $order->production->save();
+
+        return to_route('dashboard')->with('success', 'Design Rejected');
+    }
+
+
+    public function exportPdf(Request $request)
+    {
+
+        $orders = Order::query();
+
+
+
+        // dd($request->startDate);
+        if ($request->filterStatus !== null) {
+            $orders->whereHas('production', function ($query) use ($request) {
+                $query->where('status', $request->filterStatus);
+            });
+        }
+
+        if ($request->startDate !== null && $request->endDate !== null) {
+            $startDate = Carbon::parse($request->startDate)->startOfDay();
+            $endDate = Carbon::parse($request->endDate)->endOfDay();
+            $orders->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        // if ($request->has('showUserOrders') && $request->showUserOrders) {
+        //     $orders->whereHas('employees', function ($query) use ($request) {
+        //         $query->where('user_id', $request->auth_employee_id);
+        //     });
+        // }
+
+        $orders = $orders->get();
+
+        // dd($orders);
+
+
+
+        $pdfOptions = new Options();
+        $pdfOptions->set('isHtml5ParserEnabled', true);
+        $pdfOptions->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($pdfOptions);
+        $dompdf->loadHtml(View::make('orders.pdf', ['orders' => $orders])->render());
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return $dompdf->stream('orders.pdf');
+    }
+
+    public function return ($id)
+    {
+        $order = Order::with('lineups.products', 'production')->find($id);
+
+        // dd($order);
+        return Inertia::render('Return', ['order' => $order]);
+    }
+
+    public function return_records(Request $request)
+    {
+
+        $requestData = $request->input('records');
+
+        foreach ($requestData as $recordData) {
+
+            $record = Lineup::find($recordData['id']);
+
+            if ($record) {
+                $record->status = 'Error';
+                $record->note = $recordData['errorType'];
+                $record->save();
+            }
+        }
+
+
+        return to_route('dashboard');
     }
 }

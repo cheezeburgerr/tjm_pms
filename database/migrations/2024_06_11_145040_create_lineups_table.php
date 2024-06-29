@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('lower_size');
             $table->text('remarks')->nullable();
             $table->float('price')->default(0);
+            $table->string('status')->nullable();
+            $table->string('note')->nullable();
             $table->timestamps();
         });
     }

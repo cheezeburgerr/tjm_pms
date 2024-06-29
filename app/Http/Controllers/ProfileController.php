@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Order;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,18 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
+    public function index()
+    {
+
+
+        $orders = Order::with('production', 'latestapproved')->where('customer_id' , auth()->user()->id)->get();
+        // dd($orders);
+        return Inertia::render('Profile/Index', [
+            'status' => session('status'),
+            'orders' => $orders
+        ]);
+    }
+
     public function edit(Request $request): Response
     {
         return Inertia::render('Profile/Edit', [

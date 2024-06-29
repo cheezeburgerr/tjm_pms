@@ -23,4 +23,8 @@ class ProductionDetails extends Model
     public function order() {
         return $this->belongsTo(Order::class, 'order_id');
     }
+
+    public function printer() {
+        return $this->hasOne(Equipment::class, 'id', 'printer_id');
+    }
 }
