@@ -118,7 +118,7 @@ export default function ProductionDetails({ auth, boxes, order, printers }) {
 
     // Determine which component to render based on department_id
     const componentToRender = order.production.status === 'Designing'
-        ? order.latestapproved.status === 'Waiting for Approval' ? <><ApprovalWaiting order={order}/></> : <><SendDesign order={order} user={auth.employee} /></>
+        ?  (<>{order.latestapproved.status === 'Waiting for Approval' ? <><ApprovalWaiting order={order}/></> : <><SendDesign order={order} user={auth.employee} /></>}</>)
         : <PrintingInfo order={order} dept_id={auth.employee.dept_id} />
 
 

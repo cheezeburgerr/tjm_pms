@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import EmployeeLayout from '@/Layouts/EmployeeLayout';
+import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { IconPlus, IconX } from '@tabler/icons-react';
 
@@ -74,8 +74,8 @@ export default function Dashboard({ auth }) {
     };
 
     return (
-        <EmployeeLayout
-            user={auth.employee}
+        <AdminLayout
+            user={auth.admin}
             header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Products</h2>}
         >
             <Head title="Add Product" />
@@ -185,6 +185,6 @@ export default function Dashboard({ auth }) {
                     </PrimaryButton>
                 </form>
             </div>
-        </EmployeeLayout>
+        </AdminLayout>
     );
 }

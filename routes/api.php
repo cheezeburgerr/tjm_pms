@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\APIController;
 use App\Http\Controllers\ChatRoomController;
@@ -63,5 +64,11 @@ Route::get('/fetch_notifications/{id}', [NotificationController::class, 'fetch']
 Route::get('/fetch_orders/{search}', [APIController::class, 'fetch_orders']);
 Route::put('/update_notification_status/{id}', [NotificationController::class, 'update']);
 
-Route::get('/chat/{user}', [ChatRoomController::class, 'index']);
+Route::get('/chat/{user}', [ChatRoomController::class, 'user']);
+Route::get('/order-chat/{order}', [ChatRoomController::class, 'order']);
+
+
+        Route::get('/orders-per-month', [AnalyticsController::class, 'getOrdersPerMonth']);
+        Route::get('/sales', [AnalyticsController::class, 'sales']);
+
 

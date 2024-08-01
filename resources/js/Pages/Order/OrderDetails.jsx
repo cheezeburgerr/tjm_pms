@@ -4,11 +4,17 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { Card } from 'flowbite-react';
 import moment from 'moment';
-import { IconEdit, IconPackage, IconPencil, IconPhoto, IconTag, IconUser } from '@tabler/icons-react';
+import { IconEdit, IconPackage, IconPencil, IconPhoto, IconReport, IconTag, IconUser } from '@tabler/icons-react';
 import DangerButton from '@/Components/DangerButton';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { getStatusColor } from '@/statusColors'; // Import the getStatusColor function
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import { PDFDownloadLink, pdf } from '@react-pdf/renderer';
+import OrdersReport from '../Reports/OrdersReport';
+import OrderReport from '../Reports/OrderReport';
+
 export default function OrderDetails({ auth, products, order }) {
 
     const { data, setData, put, processing, errors } = useForm({
@@ -38,6 +44,83 @@ export default function OrderDetails({ auth, products, order }) {
         put(route('cancel.order', order.id), {
         });
     };
+
+    const getBase64ImageFromUrl = async (imageUrl) => {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      };
+
+    const generatePDF = async () => {
+
+        const doc = new jsPDF();
+
+        const imageUrl = '/images/TJM_Logo.png';
+        const imgData = await getBase64ImageFromUrl(imageUrl);
+
+        doc.addImage(imgData, 'JPEG', 15, 10, 25, 13); // Add the image to the PDF
+
+        doc.text('TJM Sportswear', 193, 10, {
+            align: 'right',
+
+        });
+        doc.setFontSize(12);
+        doc.text('Order Form', 193, 16, {
+            align: 'right',
+        } )
+
+        doc.setFontSize(14);
+        doc.text('Team Name:', 15, 33 );
+        doc.text(order.team_name, 60, 33 );
+        doc.text('Due Date:', 120, 33 );
+        doc.text(order.due_date, 150, 33 );
+        doc.text('Team Name:', 15, 38 );
+        doc.text(order.team_name, 60, 38 );
+        doc.text('Due Date:', 120, 38 );
+        doc.text(order.due_date, 150, 38 );
+
+        const tableColumn = ["Product", "Player Name", "Details", "Classification", "Gender", "Upper", "Lower", "Remarks"];
+        const tableRows = [];
+
+
+        order.lineups.forEach(lineup => {
+
+
+          const lineupData = [
+            lineup.player_name,
+            lineup.player_details,
+            lineup.classification,
+            lineup.gender,
+            lineup.upper_size,
+            lineup.lower_size,
+            lineup.remarks,
+          ];
+          tableRows.push(lineupData);
+        });
+
+        doc.autoTable(tableColumn, tableRows, { startY: 45, headStyles :{fillColor : [0, 232, 222]} }, );
+        const pdfBlob = doc.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        // Open the PDF in a new tab
+        const newTab = window.open();
+        newTab.document.write(`<iframe src="${pdfUrl}" width="100%" height="100%" style="border:none;"></iframe>`);
+      };
+
+      const handleOpenInNewTab = async () => {
+        try {
+          const blob = await pdf(<OrderReport data={order} />).toBlob();
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        } catch (error) {
+          console.error('Error generating PDF:', error);
+        }
+      };
 
     return (
         <AuthenticatedLayout
@@ -76,6 +159,8 @@ export default function OrderDetails({ auth, products, order }) {
 
                             </div>
                             <div className='flex items-center gap-4'>
+                                <IconReport onClick={handleOpenInNewTab} className='cursor-pointer'/>
+
                                 {order.production.status === 'Pending' && (
                                     <>
                                         <DangerButton onClick={() => (setModal(true))}>
@@ -83,19 +168,19 @@ export default function OrderDetails({ auth, products, order }) {
                                         </DangerButton>
 
                                         <Modal show={modal} onClose={closeModal}>
-                                          <div className='p-4 dark:text-gray-100'>
-                                            <h1 className='font-bold'>Cancel Order?</h1>
-                                            <p>Do you really want to cancel your order?</p>
+                                            <div className='p-4 dark:text-gray-100'>
+                                                <h1 className='font-bold'>Cancel Order?</h1>
+                                                <p>Do you really want to cancel your order?</p>
 
                                                 <form onSubmit={cancelSubmit}>
-                                                <div className="flex justify-end gap-4">
-                                                <SecondaryButton onClick={closeModal}>
-                                                    No
-                                                </SecondaryButton>
-                                                <DangerButton type="submit">
-                                                    Yes
-                                                </DangerButton>
-                                                </div>
+                                                    <div className="flex justify-end gap-4">
+                                                        <SecondaryButton onClick={closeModal}>
+                                                            No
+                                                        </SecondaryButton>
+                                                        <DangerButton type="submit">
+                                                            Yes
+                                                        </DangerButton>
+                                                    </div>
                                                 </form>
                                             </div>
 
@@ -104,7 +189,7 @@ export default function OrderDetails({ auth, products, order }) {
                                 )}
                                 {editable && (
                                     <>
-                                        <Link>
+                                        <Link href={route('orders.edit', order.id)}>
                                             <IconEdit />
                                         </Link>
                                     </>
@@ -170,7 +255,7 @@ export default function OrderDetails({ auth, products, order }) {
                                 <div>
                                     <h className="font-bold text-md">Order Price</h>
                                     <p><span className="opacity-50 mr-2">Total Price</span> {order.total_price.toFixed(2)}</p>
-                                    <p><span className="opacity-50 mr-2">Downpayment</span> {order.downpayment ? <>{order.downpayment}</> : <><Link href={route('orders.downpayment', order.id)}><PrimaryButton>Pay</PrimaryButton></Link></> }</p>
+                                    <p><span className="opacity-50 mr-2">Downpayment</span> {order.downpayment ? <>{order.downpayment}</> : <><Link href={route('orders.downpayment', order.id)}><PrimaryButton>Pay</PrimaryButton></Link></>}</p>
 
                                 </div>
                             </div>
@@ -217,7 +302,12 @@ export default function OrderDetails({ auth, products, order }) {
                                 </>
                             ))}
                         </div>
-                        <h1 className=" font-bold">Lineup</h1>
+                        <div className="flex justify-between">
+                            <h1 className=" font-bold">Lineup</h1>
+                            <Link href={route('lineup.edit', order.id)}>
+                                <IconEdit />
+                            </Link>
+                        </div>
                         <div className='p-2 overflow-x-auto'>
                             <table className='table-auto w-full text-center '>
                                 <thead className='text-xs uppercase opacity-50'>
@@ -248,9 +338,7 @@ export default function OrderDetails({ auth, products, order }) {
 
                                                         <>
 
-                                                            <Link>
-                                                                <IconPencil size={20} className='opacity-50' />
-                                                            </Link></>
+                                                            </>
                                                     )}
                                                 </td>
                                             </tr>

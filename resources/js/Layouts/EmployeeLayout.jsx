@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from 'react';
 import { Link } from '@inertiajs/react';
 import Dropdown from '@/Components/Dropdown';
 import DarkModeToggle from '@/Components/DarkModeToggle';
-import { IconLayoutBoard, IconShirt, IconPackage, IconUserCancel, IconCheck, IconMenu, IconMenu2, IconBell, IconMessage2 } from '@tabler/icons-react';
+import { IconLayoutBoard, IconShirt, IconPackage, IconUserCancel, IconCheck, IconMenu, IconMenu2, IconBell, IconMessage2, Icon3dCubeSphere, IconMessage } from '@tabler/icons-react';
 import { Button, Popover } from 'flowbite-react';
 import NotificationBox from '@/Components/Notification/NotificationBox';
 import SearchBox from '@/Components/SearchBar/SearchBox';
@@ -31,12 +31,14 @@ export default function EmployeeLayout({ user, children }) {
                     <ul className={`${isDrawerOpen ?'' : ''} p-4 transition-all`}>
                         <SidebarContext.Provider value={{ isDrawerOpen }}>
                             <SidebarItem href={route('employee.dashboard')} active={route().current('employee.dashboard')} icon={<IconLayoutBoard />} text='Board' />
-                            <SidebarItem href={route('products.index')} active={route().current('products.index')} icon={<IconShirt />} text='Products' />
+                            {/* <SidebarItem href={route('products.index')} active={route().current('products.index')} icon={<IconShirt />} text='Products' /> */}
                             <SidebarItem href={route('employee.teams')} active={route().current('employee.teams')} icon={<IconPackage />} text='Orders' />
+                            <SidebarItem href={route('models.index')} active={route().current('models.index')} icon={<Icon3dCubeSphere />} text='3D Models' />
+                            <SidebarItem href={route('employee.chat')} active={route().current('employee.chat')} icon={<IconMessage2 />} text='Chats' />
                             {user.dept_id === 2 && (
                                 <>
                                     <SidebarItem href={route('employee.pending')} active={route().current('employee.pending')} icon={<IconShirt />} text='New Orders' />
-                                    <SidebarItem href={route('employee.chat')} active={route().current('employee.chat')} icon={<IconMessage2 />} text='Chats' />
+
                                 </>
                             )}
                             {user.dept_id === 1 && user.is_supervisor === 1 && <SidebarItem href={route('employee.artist')} active={route().current('employee.artist')} icon={<IconUserCancel />} text='Without Artist' />}
@@ -55,7 +57,7 @@ export default function EmployeeLayout({ user, children }) {
                         </div>
                         <SearchBox />
                     </div>
-                    <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex flex-wrap items-center gap-2">
 
                             <NotificationBox user_id={user.id}/>
 

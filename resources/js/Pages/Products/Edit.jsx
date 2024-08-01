@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import EmployeeLayout from '@/Layouts/EmployeeLayout';
+import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm } from '@inertiajs/react';
 
 export default function EditProduct({ auth, product }) {
@@ -19,6 +19,8 @@ export default function EditProduct({ auth, product }) {
             }))
         }))
     });
+
+
 
     const addCategory = () => {
         setData('categories', [...data.categories, { category_name: '', variations: [{ variation_name: '', variation_price: '' }] }]);
@@ -60,8 +62,8 @@ export default function EditProduct({ auth, product }) {
     };
 
     return (
-        <EmployeeLayout
-            user={auth.employee}
+        <AdminLayout
+            user={auth.admin}
             header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Edit Product</h2>}
         >
             <Head title="Edit Product" />
@@ -157,6 +159,6 @@ export default function EditProduct({ auth, product }) {
                     </PrimaryButton>
                 </form>
             </div>
-        </EmployeeLayout>
+        </AdminLayout>
     );
 }

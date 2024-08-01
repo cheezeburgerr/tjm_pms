@@ -76,6 +76,7 @@ export default function FinalCheck({ auth, order }) {
                 status: 'Finished',
                 role: 'Final Checker',
                 message: 'Order Proceeded to Releasing Process',
+                customer: order.customer_id,
                 dont: true
             })
         } else {

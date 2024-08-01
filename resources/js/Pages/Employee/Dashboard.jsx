@@ -46,3 +46,4 @@ export default function Dashboard({ auth, boxes, orders, printers, errors }) {
         </EmployeeLayout>
     );
 }
+

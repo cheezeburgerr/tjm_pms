@@ -17,10 +17,18 @@
             padding: 8px;
             text-align: left;
         }
+        .header {
+            text-align: center;
+            border-bottom: 1px solid black;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>Orders Report</h1>
+    <div class="header">
+        <h1 class="font-semibold text-center ">Orders Report</h1>
+        <img src="images/TJM_logo.png" alt="">
+    </div>
     <table>
         <thead>
             <tr>
@@ -28,6 +36,7 @@
                 <th>Due Date</th>
                 <th>Status</th>
                 <th>Products</th>
+                <th>Total Lineups</th>
                 <th>Date Ordered</th>
             </tr>
         </thead>
@@ -43,6 +52,7 @@
                     @endforeach
 
                 @endforeach</td>
+                <td>{{ $order->lineups_count }}</td>
                 <td>{{ \Carbon\Carbon::parse($order->date_created)->format('F j, Y') }}</td>
             </tr>
             @endforeach

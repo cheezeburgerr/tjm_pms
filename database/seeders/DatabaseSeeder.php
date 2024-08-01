@@ -118,27 +118,26 @@ class DatabaseSeeder extends Seeder
         //     'status' => 'Working'
         // ]);
 
-        User::create([
-            'user_id' => 'TJM_00004',
-            'name' => 'Deither Ramos',
-            'email' => 'deither@gmail.com',
-            'user_type' => 'Employee',
-            'contact_number' => '0977875453',
-            'address' => 'San Carlos',
-            'is_supervisor' => 0,
-            'dept_id' => 3,
-            'password' => Hash::make('password')
-        ]);
+        // User::create([
+        //     'user_id' => 'TJM_00004',
+        //     'name' => 'Deither Ramos',
+        //     'email' => 'deither@gmail.com',
+        //     'user_type' => 'Employee',
+        //     'contact_number' => '0977875453',
+        //     'address' => 'San Carlos',
+        //     'is_supervisor' => 0,
+        //     'dept_id' => 3,
+        //     'password' => Hash::make('password')
+        // ]);
 
         User::create([
-            'user_id' => 'TJM_00005',
-            'name' => 'Chris Cadiao',
-            'email' => 'chriscadiao@gmail.com',
-            'user_type' => 'Employee',
-            'contact_number' => '09302441874',
+            'user_id' => 'ADM_00001',
+            'name' => 'Joseph Mislang',
+            'email' => 'josephmislang@gmail.com',
+            'user_type' => 'Admin',
+            'contact_number' => '09348874578',
             'address' => 'San Carlos',
-            'is_supervisor' => 0,
-            'dept_id' => 4,
+            'is_supervisor' => 1,
             'password' => Hash::make('password')
         ]);
     }

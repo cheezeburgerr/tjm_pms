@@ -10,6 +10,9 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = ['team_name', 'due_date', 'customer_id', 'total_price', 'downpayment'];
+    // protected $casts = [
+    //     'files' => 'array',
+    // ];
 
     public function products()
     {
@@ -60,4 +63,11 @@ class Order extends Model
     {
         return $this->hasMany(Lineup::class, 'order_id')->where('status', 'Reprint');
     }
+
+    public function chatroom ()
+    {
+        return $this->hasOne(ChatRoom::class, 'order_id');
+    }
+
+    
 }

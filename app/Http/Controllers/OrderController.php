@@ -17,6 +17,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Inertia\Inertia;
 
@@ -30,6 +31,55 @@ class OrderController extends Controller
         return Inertia::render('Order', ['products' => $products]);
     }
 
+
+    public function edit ($id)
+    {
+        $order = Order::with('files', 'products.products')->find($id);
+
+        return Inertia::render('Order/EditOrder', ['order' => $order]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $order = Order::with('files')->findOrFail($id);
+
+        dd($request->input());
+        // Validate request
+        // $request->validate([
+        //     'team_name' => 'required|string|max:255',
+        //     'due_date' => 'required|date',
+        //     'newFiles.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+        // ]);
+
+        // Update order details
+        $order->team_name = $request->input('team_name');
+        $order->due_date = $request->input('due_date');
+
+        // Handle previous files removal
+        $previousFiles = $request->input('previousFiles', []);
+        $previousFileNames = array_column($previousFiles, 'id');
+
+        $order->files()->whereNotIn('id', $previousFileNames)->delete();
+
+        // Handle new file uploads
+        if ($request->hasFile('newFiles')) {
+            foreach ($request->file('newFiles') as $file) {
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('images/orders'), $fileName);
+
+                $order->files()->create([
+                    'file_name' => $fileName,
+                    'file_path' => 'images/orders/' . $fileName
+                ]);
+            }
+        }
+
+        // Save the order
+        $order->save();
+
+        return redirect()->route('orders.show', $order->id)
+                         ->with('success', 'Order updated successfully');
+    }
 
     public function summary ($id) {
         $order = Order::with('products.products', 'products.variations.category', 'products.variations.variations', 'lineups.products', 'files')->find($id);
@@ -59,7 +109,8 @@ class OrderController extends Controller
 
     public function show ($id) {
 
-        $order = Order::with('production', 'products.products', 'products.variations.category', 'products.variations.variations', 'lineups.products', 'files', 'customer', 'latestapproved')->find($id);
+        $order = Order::with('production', 'products.products', 'products.variations.category', 'products.variations.variations', 'lineups.products', 'files', 'customer', 'latestapproved', 'employees.employee')->find($id);
+
         if(!$order){
             return redirect()->route('dashboard');
         }
@@ -199,7 +250,7 @@ class OrderController extends Controller
         }
 
 
-        dd('Tapos');
+        // dd('Tapos');
         return redirect()->route('orders.downpayment', $order->id); // Adjust as per your needs
     }
 
@@ -271,22 +322,28 @@ class OrderController extends Controller
         //     });
         // }
 
-        $orders = $orders->get();
+        $orders = $orders->withCount('lineups')->get();
 
         // dd($orders);
 
 
 
         $pdfOptions = new Options();
-        $pdfOptions->set('isHtml5ParserEnabled', true);
-        $pdfOptions->set('isRemoteEnabled', true);
+$pdfOptions->set('isHtml5ParserEnabled', true);
+$pdfOptions->set('isRemoteEnabled', true);
+$dompdf = new Dompdf($pdfOptions);
 
-        $dompdf = new Dompdf($pdfOptions);
-        $dompdf->loadHtml(View::make('orders.pdf', ['orders' => $orders])->render());
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
+// Load HTML content
+$dompdf->loadHtml(View::make('orders.pdf', ['orders' => $orders])->render());
 
-        return $dompdf->stream('orders.pdf');
+// Set paper size and orientation
+$dompdf->setPaper('A4', 'portrait');
+
+// Render the PDF
+$dompdf->render();
+
+// Output the generated PDF to the browser
+return $dompdf->stream('orders.pdf', ['Attachment' => false]);
     }
 
     public function return ($id)
@@ -315,5 +372,80 @@ class OrderController extends Controller
 
 
         return to_route('dashboard');
+    }
+
+    public function lineup_edit($id) {
+        $order = Order::with('products.products')->find($id);
+        $lineup = Lineup::where('order_id', $id)->get();
+
+        return Inertia::render('EditLineup', ['lineup' => $lineup, 'order' => $order]);
+    }
+
+
+
+    public function lineup_update(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'lineup' => 'required|array',
+            'lineup.*.product_id' => 'required|exists:products,id',
+            'lineup.*.player_name' => 'required|string|max:255',
+            'lineup.*.player_details' => 'nullable|string|max:255',
+            'lineup.*.classification' => 'required|string|max:255',
+            'lineup.*.gender' => 'required|string|max:255',
+            'lineup.*.upper_size' => 'required|string|max:255',
+            'lineup.*.lower_size' => 'required|string|max:255',
+            'lineup.*.remarks' => 'nullable|string|max:255',
+            // 'lineup.*.price' => 'required|int',
+        ]);
+
+        $order = Order::findOrFail($request->order_id);
+        $lineupData = $request->lineup;
+
+
+        $lineupIds = array_filter(array_column($lineupData, 'id'), function($id) {
+            return !is_null($id);
+        });
+
+
+        Lineup::where('order_id', $order->id)
+            ->whereNotIn('id', $lineupIds)
+            ->delete();
+        // dd($lineupData);
+        // Update existing lineups or create new ones
+        foreach ($lineupData as $lineup) {
+            // Log::info($lineup);
+
+            Lineup::updateOrCreate(
+
+
+                ['id' => $lineup['id'] ?? null],
+                [
+                    'order_id' => $lineup['order_id'],
+                    'product_id' => $lineup['product_id'],
+                    'player_name' => $lineup['player_name'],
+                    'player_details' => $lineup['player_details'],
+                    'classification' => $lineup['classification'],
+                    'gender' => $lineup['gender'],
+                    'upper_size' => $lineup['upper_size'],
+                    'lower_size' => $lineup['lower_size'],
+                    'price' => $lineup['price'],
+                    'remarks' => $lineup['remarks']
+                ]
+            );
+        }
+
+
+        // Remove lineups that are not in the updated lineup data
+
+
+            $price = Lineup::where('order_id', $request->order_id)->sum('price');
+
+        $order->total_price = $price;
+        $order->save();
+
+        $lineupss = Lineup::where('order_id', $order->id)->get();
+        dd($lineupss);
+        return redirect()->route('orders.show', $order->id)->with('success', 'Lineup updated successfully.');
     }
 }

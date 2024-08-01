@@ -11,9 +11,10 @@ class Lineup extends Model
 
     protected $fillable = [
         'order_id', 'product_id', 'player_name', 'player_details', 'classification',
-        'gender', 'upper_size', 'lower_size', 'remarks', 'price', 'status', 'note'
+        'gender', 'upper_size', 'lower_size', 'remarks', 'price', 'status', 'note', 'id'
     ];
 
+    protected $primaryKey = 'id';
     public function products ()
     {
         return $this->belongsTo(Products::class, 'product_id');
@@ -23,7 +24,6 @@ class Lineup extends Model
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
-
 
 
 }

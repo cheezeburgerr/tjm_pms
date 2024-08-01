@@ -3,8 +3,10 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import EmployeeLayout from '@/Layouts/EmployeeLayout';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { Card } from 'flowbite-react';
-import { IconEdit, IconPackage, IconPencil, IconPhoto, IconTag, IconUser } from '@tabler/icons-react';
+import { IconEdit, IconPackage, IconPencil, IconPhoto, IconReport, IconTag, IconUser } from '@tabler/icons-react';
 import moment from 'moment';
+import OrderReport from '../Reports/OrderReport';
+import { pdf } from '@react-pdf/renderer';
 
 export default function OrderDetails({ auth, products, order }) {
     // State to track the fullscreen image
@@ -19,6 +21,16 @@ export default function OrderDetails({ auth, products, order }) {
     const closeFullscreen = () => {
         setFullscreenImage(null);
     };
+
+    const handleOpenInNewTab = async () => {
+        try {
+          const blob = await pdf(<OrderReport data={order} />).toBlob();
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        } catch (error) {
+          console.error('Error generating PDF:', error);
+        }
+      };
 
     return (
         <EmployeeLayout
@@ -37,6 +49,7 @@ export default function OrderDetails({ auth, products, order }) {
                                 <p className='text-sm'>{moment(order.due_date).format("MMMM Do, YYYY")}</p>
                                 <p className='text-sm bg-aqua px-2 rounded-full text-zinc-900 font-bold text-center'>{order.production.status}</p>
                             </div>
+                            <IconReport onClick={handleOpenInNewTab} className='cursor-pointer'/>
                         </div>
 
                         <div className="grid grid-cols-2 grid-rows-2 p-4 text-sm gap-8">

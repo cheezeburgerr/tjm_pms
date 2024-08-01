@@ -16,8 +16,18 @@ class Message extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
     public function chatRoom()
     {
         return $this->belongsTo(ChatRoom::class);
+    }
+
+    public function files()
+    {
+        return $this->hasMany(MessageFile::class, 'message_id');
     }
 }

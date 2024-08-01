@@ -19,7 +19,7 @@ class NotificationController extends Controller
 
     public function fetch($id)
     {
-        $notifications = Notification::where('user_id', $id)->get();
+        $notifications = Notification::where('user_id', $id)->orderBy('created_at', 'desc')->get();
         // dd('ssd');
         return response()->json($notifications);
     }

@@ -9,7 +9,7 @@ class ChatRoom extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'user_id'];
+    protected $fillable = ['name', 'user_id', 'type', 'order_id'];
 
     public function messages()
     {
@@ -24,5 +24,10 @@ class ChatRoom extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
     }
 }

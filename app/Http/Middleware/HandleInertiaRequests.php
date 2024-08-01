@@ -41,6 +41,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'employee' => Auth::guard('employee')->user(),
+                'admin' => Auth::guard('admin')->user(),
             ],
         ];
     }

@@ -24,4 +24,9 @@ class Category extends Model
     {
         return $this->hasMany(Variation::class, 'category_id');
     }
+
+    public function order_category ()
+    {
+        return $this->hasMany(OrderVariation::class, 'category_id');
+    }
 }

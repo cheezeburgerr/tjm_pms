@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Lineup;
+use App\Models\Order;
 use App\Models\Products;
 use App\Models\Variation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -144,4 +147,6 @@ class ProductController extends Controller
     {
         //
     }
+
+    
 }

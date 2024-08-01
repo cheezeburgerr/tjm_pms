@@ -1,7 +1,7 @@
 
 import PrimaryButton from '@/Components/PrimaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import EmployeeLayout from '@/Layouts/EmployeeLayout';
+import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { IconEdit } from '@tabler/icons-react';
 import { Progress } from 'flowbite-react';
@@ -10,11 +10,11 @@ import { Card } from 'flowbite-react';
 export default function Dashboard({ auth, boxes, order, production, products }) {
 
     const { props } = usePage();
-    console.log(auth.employee)
+    console.log(auth.admin)
     return (
-        <EmployeeLayout
+        <AdminLayout
 
-            user={auth.employee}
+            user={auth.admin}
             header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Products</h2>}
         >
 
@@ -80,6 +80,6 @@ export default function Dashboard({ auth, boxes, order, production, products }) 
 
 
 
-        </EmployeeLayout>
+        </AdminLayout>
     );
 }

@@ -7,11 +7,13 @@ use App\Models\ApproveDesign;
 use App\Models\ChatRoom;
 use App\Models\Equipment;
 use App\Models\Lineup;
+use App\Models\Message;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\ProductionDetails;
 use App\Models\ProductionEmployee;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -156,7 +158,7 @@ class EmployeeController extends Controller
 
     public function view_order($id)
     {
-        $order = Order::with('production', 'products.products', 'products.variations.category', 'products.variations.variations', 'lineups.products', 'files', 'customer')->find($id);
+        $order = Order::with('production', 'products.products', 'products.variations.category', 'products.variations.variations', 'lineups.products', 'files', 'customer', 'employees.employee')->find($id);
 
         return Inertia::render('Employee/OrderDetails', ['order' => $order]);
     }
@@ -325,9 +327,24 @@ class EmployeeController extends Controller
         $order = ProductionDetails::find($id);
 
         $order->status = $request->status;
+
+        if($request->status === 'Finished'){
+            $order->end_production = Carbon::now();
+            $notif = Notification::create([
+                'user_id' => $request->customer,
+                'title' => 'Order Ready to Pickup',
+                'message' => 'Order "'.$order->team_name.'" is ready for you to pick it up. Go to the nearest branch to claim your order.',
+                'url' => 'orders/'.$order->order_id
+            ]);
+
+            SendNotif::dispatch($notif);
+
+        }
+
         $order->save();
 
         $emp = User::with('department')->where('id', Auth::guard('employee')->id())->first();
+
 
 
         ProductionEmployee::create([
@@ -368,10 +385,12 @@ class EmployeeController extends Controller
 
     public function chat()
     {
+
         $users = User::with('chatroom.lastmessage')->orderBy('id', 'desc')->get();
+        $orders = Order::with('chatroom.lastmessage', 'employees.employee')->orderBy('id', 'desc')->get();
         // dd($users);
         // $messages = $users->messages()->with('user')->latest()->get();
 
-        return Inertia::render('Employee/Chat', ['users' => $users]);
+        return Inertia::render('Employee/Chat', ['users' => $users, 'orders' => $orders]);
     }
 }

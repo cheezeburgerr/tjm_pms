@@ -24,10 +24,22 @@ const Message = ({ user_id, message, previousMessage }) => {
                     )}
                 </div>
             )}
-            <div className={`flex ${user_id === message.user_id ? 'justify-end' : 'justify-start'}`}>
+            <div className={`flex flex-col ${user_id === message.user_id ? 'items-end' : 'items-start'}`}>
                 <div className={`p-2 px-4 rounded-lg ${user_id === message.user_id ? "bg-aqua rounded-br-none" : "bg-gray-50 dark:bg-gray-500 rounded-bl-none"} max-w-48`} role="alert" onClick={() => setShowTime(!showTime)}>
                     {message.message}
                 </div>
+                {message.files.length > 0 && (
+                            <>
+                            <div className="flex gap-4">
+                            {message.files.map(file => (
+                                <>
+                                    <img src={`/storage/${file.path}`} alt={file.path} className='min-h-18 max-h-32 rounded-lg'/>
+                                </>
+                            ))}
+                            </div>
+
+                            </>
+                        )}
             </div>
         </div>
     );

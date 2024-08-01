@@ -64,6 +64,26 @@ export default function Checking({ auth, order, artists }) {
                     </>
                 )
             },
+            {
+                Header: "Action",
+                Cell: ({ row }) => (
+                    <>
+                        <div className="flex gap-4">
+                        <Link href={route('employee.vieworder', row.original.id)}>
+                            <Tooltip content="View">
+                                <IconEye className='hover:text-aqua transition' />
+                            </Tooltip>
+                        </Link>
+
+                        <Link href={row.original.production.status === 'Printing' ? route('checking.show', row.original.id) : route('final-checking.show', row.original.id)}>
+                            <Tooltip content={row.original.production.status === 'Printing' ? 'Check' : 'Final Check'}>
+                                <IconCheck className='hover:text-aqua transition' />
+                            </Tooltip>
+                        </Link>
+                        </div>
+                    </>
+                )
+            },
 
         ],
         []

@@ -18,6 +18,7 @@ export default function OrderFormStepOne({ data, setData, nextStep }) {
         const files = e.target.files;
         setData('files', files);
 
+
         // Extract file URLs and update the state
         const fileURLs = Array.from(files).map(file => URL.createObjectURL(file));
         setUploadedFiles(fileURLs);

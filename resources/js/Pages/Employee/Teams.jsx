@@ -11,6 +11,11 @@ import Checkbox from '@/Components/Checkbox';
 import InputLabel from '@/Components/InputLabel';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import OrdersReport from '../Reports/OrdersReport';
+import { PDFDownloadLink, pdf } from '@react-pdf/renderer';
+
 
 const Filters = ({ showUserOrders, setShowUserOrders, filterStatus, setFilterStatus, startDate, setStartDate, endDate, setEndDate }) => {
     const handleStatusChange = (e) => {
@@ -79,7 +84,7 @@ export default function Teams({ auth, order, artists }) {
 
         if (startDate && endDate) {
             orders = orders.filter(o => {
-                const orderDate = moment(o.date_created);
+                const orderDate = moment(o.due_date);
                 return orderDate.isBetween(startDate, endDate, 'days', '[]');
             });
         }
@@ -149,7 +154,7 @@ export default function Teams({ auth, order, artists }) {
                 accessor: 'date_created',
                 Cell: ({ row }) => (
                     <>
-                        <p>{moment(row.original.date_created).format("MMMM Do, YYYY")}</p>
+                        <p>{moment(row.original.created_at).format("MMMM Do, YYYY")}</p>
                     </>
                 )
             },
@@ -222,6 +227,82 @@ export default function Teams({ auth, order, artists }) {
         window.open(url, '_blank');
     };
 
+
+    const getBase64ImageFromUrl = async (imageUrl) => {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    };
+
+    const generatePDF = async () => {
+
+        const doc = new jsPDF();
+
+        const imageUrl = '/images/TJM_Logo.png';
+        const imgData = await getBase64ImageFromUrl(imageUrl);
+
+        doc.addImage(imgData, 'JPEG', 15, 10, 25, 13); // Add the image to the PDF
+
+        doc.text('TJM Sportswear', 193, 10, {
+            align: 'right',
+
+        });
+        doc.setFontSize(12);
+        doc.text('Orders Report', 193, 16, {
+            align: 'right',
+        })
+
+        doc.text('Month: ', 15, 33);
+        doc.text(startDate ? moment(startDate).format('MMMM d YYYY') : "", 30, 33);
+
+        doc.text(showUserOrders ? 'Artist:' : '', 65, 33);
+        doc.text(showUserOrders ? auth.employee.name : '', 80, 33);
+
+        doc.text(filterStatus ? 'Status:' : '', 135, 33);
+        doc.text(filterStatus ? filterStatus : '', 150, 33);
+
+        const tableColumn = ["Team Name", "Due Date", "Products", "Lineups", "Date Ordered"];
+        const tableRows = [];
+
+
+        filteredOrders.forEach(order => {
+
+            const products = order.products.map(product => (product.products.map(p => `${p.product_name}`))).join(", ");
+            const orderData = [
+                order.team_name,
+                moment(order.due_date).format('MMMM d YYYY'),
+                products,
+                order.lineups_count,
+                moment(order.created_at).format('MMMM d YYYY'),
+            ];
+            tableRows.push(orderData);
+        });
+
+        doc.autoTable(tableColumn, tableRows, { startY: 35, headStyles: { fillColor: [0, 232, 222] } },);
+        const pdfBlob = doc.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        // Open the PDF in a new tab
+        const newTab = window.open();
+        newTab.document.write(`<iframe src="${pdfUrl}" width="100%" height="100%" style="border:none;"></iframe>`);
+    };
+
+
+    const handleOpenInNewTab = async () => {
+        try {
+          const blob = await pdf(<OrdersReport data={filteredOrders} month={startDate ? moment(startDate).format('MMMM d YYYY') : null} status={filterStatus} artist={showUserOrders ? auth.employee.name : ''}/>).toBlob();
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        } catch (error) {
+          console.error('Error generating PDF:', error);
+        }
+      };
+
     return (
         <EmployeeLayout
             user={auth.employee}
@@ -250,7 +331,9 @@ export default function Teams({ auth, order, artists }) {
                 />
                 <div className='space-x-2'>
                     <PrimaryButton onClick={exportToCSV}><IconCsv /></PrimaryButton>
-                    <PrimaryButton onClick={exportToPDF}><IconPdf /></PrimaryButton>
+                    {/* <PrimaryButton onClick={exportToPDF}><IconPdf /></PrimaryButton> */}
+                    {/* <PrimaryButton onClick={generatePDF}><IconPdf /></PrimaryButton> */}
+                    <PrimaryButton onClick={handleOpenInNewTab}><IconPdf /></PrimaryButton>
                 </div>
             </div>
             <div className="md:hidden">
@@ -269,7 +352,7 @@ export default function Teams({ auth, order, artists }) {
                             />
                             <div className='space-x-2'>
                                 <PrimaryButton onClick={exportToCSV}><IconCsv /></PrimaryButton>
-                                <PrimaryButton onClick={exportToPDF}><IconPdf /></PrimaryButton>
+                                <PrimaryButton onClick={handleOpenInNewTab}><IconPdf /></PrimaryButton>
                             </div>
                         </div>
                     </>
@@ -279,6 +362,7 @@ export default function Teams({ auth, order, artists }) {
             </div>
             <div className="dark:text-gray-100">
                 <Table data={filteredOrders} columns={columns} />
+
             </div>
         </EmployeeLayout>
     );

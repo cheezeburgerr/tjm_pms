@@ -4,6 +4,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
 import { IconX } from '@tabler/icons-react';
+import { Tabs } from 'flowbite-react';
 
 export default function LineupForm({ data, setData, prevStep, products }) {
     // Ensure that data.lineups is initialized properly
@@ -11,6 +12,7 @@ export default function LineupForm({ data, setData, prevStep, products }) {
 
     const [rows, setRows] = useState(data.lineups.length > 0 ? data.lineups : [{ id: 0 }]);
 
+    const [showSizeChart, setShowSizeChart] = useState(false);
     const addRow = () => {
         setRows(prevRows => [...prevRows, { id: prevRows.length }]);
     };
@@ -60,7 +62,30 @@ export default function LineupForm({ data, setData, prevStep, products }) {
 
     return (
         <div>
-            <h2 className='mb-6'>Select Lineup</h2>
+
+            {showSizeChart && (
+                <div className="p-4 bg-zinc-100 dark:bg-zinc-800 rounded-lg mb-4">
+                    <h1>Size Chart</h1>
+                    <Tabs aria-label="Full width tabs" style="fullWidth">
+                    <Tabs.Item active title="Adult Jersey">
+                            <img src="/images/products/size-charts/adult-jersey.jpg" alt="jersey size chart" />
+                        </Tabs.Item>
+                        <Tabs.Item title="Kids Jersey">
+                            <img src="/images/products/size-charts/kids-jersey.jpg" alt=" kids jersey size chart" />
+                        </Tabs.Item>
+                        <Tabs.Item active title="Tshirt">
+                        <img src="/images/products/size-charts/adult-jersey.jpg" alt="jersey size chart" />
+                        </Tabs.Item>
+                        <Tabs.Item active title="Polo">
+                        <img src="/images/products/size-charts/polo.jpg" alt="polo size chart" />
+                        </Tabs.Item>
+                    </Tabs>
+                </div>
+            )}
+            <div className="flex justify-between">
+            <h2 className='mb-6'>Add Lineup</h2>
+            <SecondaryButton className='h-8'onClick={() => setShowSizeChart(!showSizeChart)}>Size Chart</SecondaryButton>
+            </div>
             <form className="relative overflow-x-auto  sm:rounded-lg" >
                 <div className="mb-3 sticky top-15 bg-light p-3">
                     <div className="row">
